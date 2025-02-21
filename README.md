@@ -27,4 +27,24 @@ Magma Version 2.28-19 or later is recommended, and version 2.28-5 or later is re
 
 The package file [gl2split.m](https://github.com/AndrewVSutherland/CompletelyDecomposableModularJacobians/blob/main/gl2split.m) implements two intrinsics of note: `GL2SplitLattice` and `GL2SplitVerify`.  The function `GL2SplitLattice` implements the algorithm described in the paper to search for completely decomposable modular Jaocbians of a specified level N and generates an output file `gl2smin_N.txt` with the same format as `grpdata.txt` with the final `label` column omitted.  It also takes an optional parameter `threads`.  The default is 1 thread, which is fine for small N, but for larger N the computations will complete much more quickly using a larger number of threads (the computations described in the paper all used 360 threads running on a 360 vCPU machine, and even with this many threads, level 120 takes several days to complete).
 
-The function `GL2SplitVerify` rigorously verifies the results of `GL2SplitLattice` for a given value of N.  This can be used to verify all the examples in `examples.txt` in a reasonable short amount of time (about 15 minutes using 1 thread on a fast machine).
+The function `GL2SplitVerify` rigorously verifies the results of `GL2SplitLattice` for a given value of N.  This can be used to verify all the examples in `examples.txt` in a reasonable short amount of time (around 5 minutes using 1 thread on a fast machine).  To perform this verification, clone this repo to a machine with Magma version 2.28-5 or later installed and run:
+```
+$ magma -b
+> AttachSpec("spec");
+> for N in [7,10,11,15,18,20,24,28,30,36,48,60,120] do print N,GL2SplitVerify("examples.txt",N); end for;
+```
+This should take 5-10 minutes (almost all of which will be spent on level 120).  Note that no verification is required for N <= 6 because the genus of curves at these levels is bounded by 1.
+
+To recompute the all the groups in `grpdata.txt` of level N use
+```
+$ magma -b
+> AttachSpec("spec");
+> GL2SplitLattice(N:threads:=n);
+```
+with `n` set to the number of cores or hyperthreads you have available on your machine.
+
+So see more details about either computation as it is being run type
+```
+SetVerbose("GL2",1);
+```
+before calling `GL2SplitVerify` or `GL2SplitLattice`.
