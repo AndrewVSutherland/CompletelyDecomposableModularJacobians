@@ -79,7 +79,12 @@ intrinsic GL2IsCompletelyDecomposable(H::GrpMat:extra:=100) -> BoolElt, SeqEnum[
     v := Vector(Rationals(),t[1..#E])*I;  w := Vector(Integers(),t[#E+1..#Q]);
     if &and[v[i] ge 0 and Denominator(v[i]) eq 1:i in [1..Degree(v)]] and ChangeRing(v,Integers())*J eq w and &+Eltseq(v) eq GL2Genus(H) then
         F := [];
-        for i:=1 to Degree(v) do if v[i] gt 0 then s := LMFDBLabel(E[i]); for j:=1 to Integers()!v[i] do Append(~F,s); end for; end if; end for;
+        for i:=1 to Degree(v) do
+            if v[i] gt 0 then
+                s := LMFDBLabel(E[i]); while s[#s] ge "0" and s[#s] le "9" do Prune(~s); end while;
+                F cat:= [s:j in [1..Integers()!v[i]]];
+            end if;
+        end for;
         return true, F;
     else
         return false;
