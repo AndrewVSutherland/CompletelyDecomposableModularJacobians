@@ -55,6 +55,37 @@ intrinsic InvertibleTraceMatrix(T::SeqEnum[SeqEnum[RngIntElt]],N::RngIntElt) -> 
     return M, Q[I], I; // if v is a row vector encoding a linear combination x of Frobenius traces at p in Q then v*M = x, and v = x*M^-1 lets us recover v from the linear combination
 end intrinsic;
 
+intrinsic GL2IsCompletelyDecomposable(H::GrpMat:extra:=100) -> BoolElt, SeqEnum[MonStgElt]
+{ Given a subgroup H of GL(2,Z/NZ) containing -I with surjective determinant attempts to decompose J_H as a product of elliptic curves. }
+    require GL2DeterminantIndex(H) eq 1: "Subgroup must have surjective determinant";
+    N,H := GL2Level(GL2IncludeNegativeOne(H));
+    if N le 5 then return true, []; end if;
+    if GL2Genus(H) eq 0 then return true, []; end if;    
+    E := EllipticCurvesOfConductorDividing(N^2);
+    if #E eq 0 then return false; end if;
+    badp := PrimeDivisors(N); badi := [#PrimesUpTo(p):p in badp];
+    B := NthPrime(#E+extra+#badp); repeat B := Ceiling(1.3*B);  T := TracesOfFrobenius(E,B); I:=[i:i in [1..#T[1]]|not i in badi]; until Rank(Matrix([t[I]:t in T])) ge #E;
+    I,Q := InvertibleTraceMatrix(T,N);
+    I := I^-1;
+    P := PrimesUpTo(B);
+    while true do
+        i:= #PrimesUpTo(Q[#Q])+1; pi := []; while #pi lt extra and i le #T[1] do if N mod P[i] ne 0 then Append(~pi,i); end if; i +:= 1; end while;
+        if #pi eq extra then break; end if;
+        B := Ceiling(1.1*B); P := PrimesUpTo(B); T := TracesOfFrobenius(E,B);
+    end while;
+    Q cat:= P[pi]; J := Matrix(Integers(),[[T[i][j]:j in pi]:i in [1..#T]]); delete pi;
+    M := GL2PointCountsPrecompute(N,Q);
+    t := GL2Traces(H,Q,M);
+    v := Vector(Rationals(),t[1..#E])*I;  w := Vector(Integers(),t[#E+1..#Q]);
+    if &and[v[i] ge 0 and Denominator(v[i]) eq 1:i in [1..Degree(v)]] and ChangeRing(v,Integers())*J eq w and &+Eltseq(v) eq GL2Genus(H) then
+        F := [];
+        for i:=1 to Degree(v) do if v[i] gt 0 then s := LMFDBLabel(E[i]); for j:=1 to Integers()!v[i] do Append(~F,s); end for; end if; end for;
+        return true, F;
+    else
+        return false;
+    end if;
+end intrinsic;
+
 intrinsic GL2SplitLattice(N::RngIntElt:threads:=1,extra:=10)
 { Enumerates the subgroup lattice of GL(2,Z/NZ) consisting of H containing -1 with surjective determinant for which J_H appears to be completely decomposable, writing results of positive genus to gl2smin_N.txt in the format level:index:genus:generators.  While the output file is guaranteed to contain every completely decomposable J_H, it may contain some that are not. }
     require N gt 0: "N must be a positive integer";
