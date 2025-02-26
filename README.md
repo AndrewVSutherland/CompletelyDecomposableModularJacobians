@@ -3,7 +3,7 @@ Code and data associated to the paper "Completely decomposable modular Jacobians
 
 ## Data
 
-The file `exmaples.txt` contains details about each of the 84 modular curves X_H listed in Table 1 of the paper.  The file contains lines of the form
+The file `examples.txt` contains details about each of the 84 modular curves X_H listed in Table 1 of the paper.  The file contains lines of the form
 ```
   N:i:g:gens:label:[ec1,ec2,...]
 ```
@@ -15,7 +15,7 @@ where
 - `label` is the LMFDB label of X_H if known (otherwise it will be `?`).
 - `[ec1,ec2,...]` is a list of g LMFDB labels of isogeny classes of elliptic curves that appear as isogeny factors of J_H.
 
-The file `grpdata.txt` contains information about the 561,077 open subgroups H of GL(2,Zhat) of with surjective determinant containing -I of level less than 240 for which J_H is completely decomposable (including the 83 groups in `examples.txt` with positive genus).  It's records have the same format as examples.txt except the list of isogeny class labels at the end is omitted to save space (this list can can be easily recomputed for any particular group using the function `GL2IsCompletelyDecomposable`, see below).
+The file `grpdata.txt` contains information about the 561,077 open subgroups H of GL(2,Zhat) of with surjective determinant containing -I of level less than 240 for which J_H is completely decomposable (including the 83 groups in `examples.txt` with positive genus).  It's records have the same format as examples.txt except the list of isogeny class labels at the end is omitted to save space (this list can be easily recomputed for any particular group using the function `GL2IsCompletelyDecomposable`, see below).
 
 The files `cmfdata_N.txt` contain modular form data sufficient to rigorously verify the decomposition of J_H for H of level N; it includes a complete list of traceforms associated to Galois orbits of all weight 2 newforms f of level dividing N^2 with character of conductor dividing N.  As proved in [RSZB22](https://www.cambridge.org/core/journals/forum-of-mathematics-sigma/article/ell-adic-images-of-galois-for-elliptic-curves-over-mathbb-q-and-an-appendix-with-john-voight/D5BC92F9949B387570A7D764635B6AC8), for H of level N, the isogeny decompostion of J_H consists entirely of modular abelian varieties A_f associated to such newforms f.  There are files for each of the levels N = 6,7,10,11,15,18,20,24,28,30,36,48,60,120, which suffices to verify all the examples in `examples.txt`.
 
@@ -51,13 +51,13 @@ gl2smin_15.txt in 0.010s seconds, total elapsed time 1.540s (0.080s/group)
 ```
 with `n` set to the number of cores or hyperthreads you have available on your machine.
 
-So see more details about either computation as it is being run type
+To see more details about either computation as it is being run type
 ```
 SetVerbose("GL2",1);
 ```
 before calling `GL2SplitVerify` or `GL2SplitLattice`.
 
-To compute the list of elliptic curve isogeny classes in the decomposition of J_H for a particular H in GL(2,Z/NZ), including but not limited to any of the H listed in `grpdata.txt` you can use the function `GL2IsCompletelyDecomposable`.  For example
+To compute the list of elliptic curve isogeny classes in the decomposition of J_H for a particular H in GL(2,Z/NZ), including but not limited to any of the H listed in `grpdata.txt`, you can use the function `GL2IsCompletelyDecomposable`.  For example
 ```
 $ magma -b
 > AttachSpec("spec");
